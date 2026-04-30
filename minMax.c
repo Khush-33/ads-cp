@@ -59,70 +59,34 @@ void minmax_insert(MinMaxHeap* mmh, PCB* p, int score) {
         fprintf(stderr, "❌ Error: MinMax Heap is full (max: %d jobs)\n", MAX_HEAP_SIZE);
         return;
     }
+    
     // Insert at end
     int i = mmh->size;
     mmh->heap[i].process = p;
     mmh->heap[i].efficiency_score = score;
     mmh->size++;
-
-    if (i == 0) return;
-
-    int parent = get_parent(i);
-
-    if (is_min_level(i)) {
-        // Node is on a min level
-        if (mmh->heap[i].efficiency_score > mmh->heap[parent].efficiency_score) {
-            // If greater than parent (parent on max level), swap and bubble up on max levels
-            minmax_swap_nodes(&mmh->heap[i], &mmh->heap[parent]);
-            i = parent;
-            // Bubble up through grandparents on max levels
-            while (i > 2) {
-                int gp = get_parent(get_parent(i));
-                if (gp >= 0 && mmh->heap[i].efficiency_score > mmh->heap[gp].efficiency_score) {
-                    minmax_swap_nodes(&mmh->heap[i], &mmh->heap[gp]);
-                    i = gp;
-                } else {
-                    break;
-                }
+    
+    // Bubble up
+    while (i > 0) {
+        int parent = get_parent(i);
+        
+        if (is_min_level(i)) {
+            // Current is on min level
+            if (mmh->heap[i].efficiency_score < mmh->heap[parent].efficiency_score) {
+                // Smaller than parent, swap with parent and continue
+                minmax_swap_nodes(&mmh->heap[i], &mmh->heap[parent]);
+                i = parent;
+            } else {
+                break;
             }
         } else {
-            // Bubble up on min levels comparing with grandparents
-            while (i > 2) {
-                int gp = get_parent(get_parent(i));
-                if (gp >= 0 && mmh->heap[i].efficiency_score < mmh->heap[gp].efficiency_score) {
-                    minmax_swap_nodes(&mmh->heap[i], &mmh->heap[gp]);
-                    i = gp;
-                } else {
-                    break;
-                }
-            }
-        }
-    } else {
-        // Node is on a max level
-        if (mmh->heap[i].efficiency_score < mmh->heap[parent].efficiency_score) {
-            // If smaller than parent (parent on min level), swap and bubble up on min levels
-            minmax_swap_nodes(&mmh->heap[i], &mmh->heap[parent]);
-            i = parent;
-            // Bubble up through grandparents on min levels
-            while (i > 2) {
-                int gp = get_parent(get_parent(i));
-                if (gp >= 0 && mmh->heap[i].efficiency_score < mmh->heap[gp].efficiency_score) {
-                    minmax_swap_nodes(&mmh->heap[i], &mmh->heap[gp]);
-                    i = gp;
-                } else {
-                    break;
-                }
-            }
-        } else {
-            // Bubble up on max levels comparing with grandparents
-            while (i > 2) {
-                int gp = get_parent(get_parent(i));
-                if (gp >= 0 && mmh->heap[i].efficiency_score > mmh->heap[gp].efficiency_score) {
-                    minmax_swap_nodes(&mmh->heap[i], &mmh->heap[gp]);
-                    i = gp;
-                } else {
-                    break;
-                }
+            // Current is on max level
+            if (mmh->heap[i].efficiency_score > mmh->heap[parent].efficiency_score) {
+                // Larger than parent, swap with parent and continue
+                minmax_swap_nodes(&mmh->heap[i], &mmh->heap[parent]);
+                i = parent;
+            } else {
+                break;
             }
         }
     }
