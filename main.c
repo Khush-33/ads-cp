@@ -8,6 +8,7 @@
 #include "JobTrie.h"
 #include "MinMaxHeap.h"
 #include "JobCorrector.h"
+#include "AVLTree.h"
 
 
 void print_menu() {
@@ -18,6 +19,8 @@ void print_menu() {
     printf("  4.Show most/least efficient job\n");
     printf("  5.Suggest correct job name (spell check)\n");
     printf("  6.List all jobs\n");
+    printf("  7.Show jobs by execution time\n");
+    printf("  8.Find jobs in time range\n");
     printf("  0.Exit\n");
 }
 
@@ -47,6 +50,12 @@ void to_lowercase(char* str) {
     for (int i = 0; str[i]; i++) str[i] = tolower(str[i]);
 }
 
+int calculate_execution_time(int priority) {
+    int min_time = 5 + priority * 3;
+    int max_time = 20 + priority * 8;
+    return min_time + (rand() % (max_time - min_time + 1));
+}
+
 void calculate_job_properties(int priority, const char* name, int* efficiency, int* memory) {
     *efficiency = priority * 10;
     *memory = priority * 100;
@@ -63,6 +72,7 @@ int main() {
     PriorityQueue* pq = create_priority_queue();
     MinMaxHeap* mmh = create_minmax_heap();
     Trie* jobDatabase = create_trie();
+    AVLTree* avl = create_avl_tree();
     int running = 1;
     int job_count = 0;
     
@@ -90,13 +100,16 @@ int main() {
                 int priority = get_valid_int("Priority (1-10, lower = higher priority): ", 1, 10);
                 int efficiency, memory;
                 calculate_job_properties(priority, name, &efficiency, &memory);
+                int execution_time = calculate_execution_time(priority);
                 PCB* p = create_pcb(name, efficiency, memory);
                 if (p) {
                     enqueue(pq, p, priority);
                     minmax_insert(mmh, p, efficiency);
                     insert_job(jobDatabase, name, p);
+                    avl->root = insert_avl(avl->root, p, execution_time);
+                    avl->size++;
                     job_count++;
-                    printf("Job '%s' added successfully! (Total jobs: %d)\n\n", name, job_count);
+                    printf("Job '%s' added successfully! (Time: %ds, Total: %d)\n\n", name, execution_time, job_count);
                 } else printf("Failed to create job. Memory allocation error.\n\n");
                 break;
             }
@@ -170,6 +183,30 @@ int main() {
                 break;
             }
             
+            case 7: {
+                printf("\nJobs by Execution Time\n");
+                if (avl->size == 0) printf(" No jobs in database.\n");
+                else {
+                    printf("Total jobs: %d\n\n", avl->size);
+                    inorder_avl(avl->root);
+                }
+                printf("\n");
+                break;
+            }
+            
+            case 8: {
+                if (avl->size == 0) printf(" No jobs in database.\n\n");
+                else {
+                    printf("\nFind jobs in time range\n");
+                    int min_time = get_valid_int("Enter minimum time (seconds): ", 1, 300);
+                    int max_time = get_valid_int("Enter maximum time (seconds): ", min_time, 300);
+                    printf("\nJobs between %d-%d seconds:\n", min_time, max_time);
+                    range_query_avl(avl->root, min_time, max_time);
+                    printf("\n");
+                }
+                break;
+            }
+            
             case 0: {
                 printf("\nShutting down...\n");
                 running = 0;
@@ -177,7 +214,7 @@ int main() {
             }
             
             default: {
-                printf("Invalid choice! Please enter a number between 0-6.\n\n");
+                printf("Invalid choice! Please enter a number between 0-8.\n\n");
             }
         }
     }
@@ -188,6 +225,8 @@ int main() {
     minmax_destroy(mmh);
     printf(" Destroying Job Database...\n");
     destroy_trie(jobDatabase);
+    printf(" Destroying AVL Tree...\n");
+    destroy_avl_tree(avl);
     printf("\n ECO-CLOUD JOB SCHEDULER closed successfully!\n");
     return 0;
 }
