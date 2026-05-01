@@ -521,21 +521,6 @@ Expected: ✅ All features work together
 
 ---
 
-## 🏁 Final Features & Fixes (v1.1)
-
-This release finalizes the project for submission and includes a set of correctness, safety, and usability improvements made after initial testing.
-
-- **Heap correctness fixes:** Resolved MinMax heap bubble-up logic to avoid incorrect swaps (grandparent checks tightened). Ensures `peek_min()` and `peek_max()` return true min/max.
-- **Synchronized deletions:** Added `minmax_delete_by_pcb()` and coordinated deletions so scheduling removes jobs from Priority Queue, MinMax Heap, and Trie consistently.
-- **Active-job filtering:** `list_all_jobs()` only shows active (unscheduled) jobs by checking the `is_active` flag in the `PCB`.
-- **Safety & input validation:** Replaced unsafe `strcpy` with `strncpy`, added robust input validation for name, priority, efficiency, and memory fields.
-- **User-friendly terminal UI:** Improved prompts, clearer success/error messages, and confirmation lines to make the CLI experience smoother.
-- **Spell-correction suggestions:** Edit-distance based suggestions for mistyped job names using `JobCorrector`.
-- **Documentation & examples:** Expanded README with usage examples, test cases, and a reproducible workflow to validate behavior.
-
-If you want, I can bump the README version and create a short changelog file `CHANGELOG.md` with a one-line entry per change.
-
-
 ## 📝 Code Quality
 
 ### Best Practices Implemented
