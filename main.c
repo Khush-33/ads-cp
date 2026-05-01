@@ -7,7 +7,7 @@
 #include "PriorityQueue.h"
 #include "JobTrie.h"
 #include "MinMaxHeap.h"
-#include "JobCorrector.h"
+#include "JobCorrector.c"
 
 
 void print_menu() {
