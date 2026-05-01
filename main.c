@@ -16,10 +16,9 @@ void print_menu() {
     printf("  2.Search for a job by name\n");
     printf("  3.Schedule next job (by priority)\n");
     printf("  4.Show most/least efficient job\n");
-    printf("  5.Suggest correct job name (spell check)\n");
-    printf("  6.List all jobs\n");
-    printf("  7.Show jobs by execution time\n");
-    printf("  8.Find jobs in time range\n");
+    printf("  5.List all jobs\n");
+    printf("  6.Show jobs by execution time\n");
+    printf("  7.Find jobs in time range\n");
     printf("  0.Exit\n");
 }
 
@@ -124,7 +123,30 @@ int main() {
                     if (found) {
                         printf("Job found:\n");
                         print_pcb_details(found);
-                    } else printf("Job '%s' not found in database.\n", name);
+                    } else {
+                        char activeJobs[100][50];
+                        for (int i = 0; i < pq->size; i++) strcpy(activeJobs[i], pq->heap[i].process->job_id);
+                        
+                        char suggestion[50];
+                        suggestCorrection(name, activeJobs, pq->size, suggestion);
+                        int accepted = 0;
+                        
+                        if (strcmp(suggestion, "No close match found") != 0) {
+                            char ans;
+                            printf("Not found. Did you mean '%s'? (y/n): ", suggestion);
+                            scanf(" %c", &ans);
+                            while (getchar() != '\n'); // safely discard the Enter key
+                            
+                            if (ans == 'y') {
+                                print_pcb_details(search_job(jobDatabase, suggestion));
+                                accepted = 1;
+                            }
+                        }
+                        
+                        if (!accepted) {
+                            printf("Job '%s' not found in database.\n", name);
+                        }
+                    }
                     printf("\n");
                 }
                 break;
@@ -157,21 +179,6 @@ int main() {
             }
             
             case 5: {
-                if (job_count == 0) printf(" No jobs in database for spell check.\n\n");
-                else {
-                    printf("\n Job name spell checker...\n");
-                    char name[64];
-                    get_valid_string("Enter job name to check: ", name, sizeof(name));
-                    to_lowercase(name);
-                    PCB* found = search_job(jobDatabase, name);
-                    if (found) printf("Name is correct!\n");
-                    else printf("Did not find exact match.\n   Use option 2 (Search) to find similar jobs.\n");
-                    printf("\n");
-                }
-                break;
-            }
-            
-            case 6: {
                 printf("\nAll Jobs in Database\n");
                 if (job_count == 0) printf(" No jobs in database.\n");
                 else {
@@ -182,7 +189,7 @@ int main() {
                 break;
             }
             
-            case 7: {
+            case 6: {
                 printf("\nJobs by Execution Time\n");
                 if (avl->size == 0) printf(" No jobs in database.\n");
                 else {
@@ -193,7 +200,7 @@ int main() {
                 break;
             }
             
-            case 8: {
+            case 7: {
                 if (avl->size == 0) printf(" No jobs in database.\n\n");
                 else {
                     printf("\nFind jobs in time range\n");
