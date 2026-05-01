@@ -567,18 +567,3 @@ This project demonstrates:
 - **Error Handling**: Robust CLI application design
 
 ---
-
-## 📧 Technical Support
-
-For questions about:
-- **Compilation**: Check gcc version with `gcc --version`
-- **Runtime**: Ensure all source files are in same directory
-- **Features**: Run the application and follow on-screen prompts
-- **Logic**: Review Implementation Details section above
-
----
-
-## 📄 License
-
-This is an academic project for VIT Advanced Data Structures course. 
-
