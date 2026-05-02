@@ -8,6 +8,7 @@
 #include "MinMaxHeap.h"
 #include "JobCorrector.c"
 #include "AVLTree.h"
+#include "SkipList.h"
 
 
 void print_menu() {
@@ -19,6 +20,8 @@ void print_menu() {
     printf("  5.List all jobs\n");
     printf("  6.Show jobs by execution time\n");
     printf("  7.Find jobs in time range\n");
+    printf("  8.View scheduled jobs history\n");
+    printf("  9.View scheduler statistics\n");
     printf("  0.Exit\n");
 }
 
@@ -71,6 +74,7 @@ int main() {
     MinMaxHeap* mmh = create_minmax_heap();
     Trie* jobDatabase = create_trie();
     AVLTree* avl = create_avl_tree();
+    SkipList* history = create_skip_list();
     int running = 1;
     int job_count = 0;
     
@@ -155,11 +159,13 @@ int main() {
             case 3: {
                 printf("\nScheduling next job...\n");
                 if (!is_empty(pq)) {
+                    int scheduled_priority = pq->heap[0].priority; // peek priority before dequeue
                     PCB* job = dequeue(pq);
                     printf("Next scheduled job:\n");
                     print_pcb_details(job);
                     mark_job_scheduled(jobDatabase, job->job_id);
                     minmax_delete_by_pcb(mmh, job);
+                    skip_insert(history, job, scheduled_priority, job->burst_time); // record in history
                     job_count--;
                 } else printf("No jobs in queue to schedule.\n");
                 printf("\n");
@@ -213,6 +219,20 @@ int main() {
                 break;
             }
             
+            case 8: {
+                printf("\nScheduled Jobs History\n");
+                skip_print_all(history);
+                printf("\n");
+                break;
+            }
+            
+            case 9: {
+                printf("\nScheduler Statistics\n");
+                skip_print_stats(history);
+                printf("\n");
+                break;
+            }
+            
             case 0: {
                 printf("\nShutting down...\n");
                 running = 0;
@@ -220,7 +240,7 @@ int main() {
             }
             
             default: {
-                printf("Invalid choice! Please enter a number between 0-8.\n\n");
+                printf("Invalid choice! Please enter a number between 0-9.\n\n");
             }
         }
     }
@@ -233,6 +253,8 @@ int main() {
     destroy_trie(jobDatabase);
     printf(" Destroying AVL Tree...\n");
     destroy_avl_tree(avl);
+    printf(" Destroying Job History...\n");
+    destroy_skip_list(history);
     printf("\n ECO-CLOUD JOB SCHEDULER closed successfully!\n");
     return 0;
 }
