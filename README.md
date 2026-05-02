@@ -1,38 +1,41 @@
-# ☁️ ECO-CLOUD JOB SCHEDULER
+# ECO-CLOUD JOB SCHEDULER
 
-A high-performance job scheduling system built with advanced data structures for cloud computing environments.
+A job scheduling system's low level implementations simulation built with advanced data structures.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 - [Project Overview](#project-overview)
 - [Features](#features)
-- [System Requirements](#system-requirements)
 - [Project Structure](#project-structure)
 - [Data Structures Used](#data-structures-used)
-- [Compilation](#compilation)
 - [How to Run](#how-to-run)
 - [Usage Guide](#usage-guide)
 - [Implementation Details](#implementation-details)
 - [Time Complexity Analysis](#time-complexity-analysis)
+- [Test Cases](#test-cases)
+- [Known Limitations](#known-limitations)
+- [Educational Value](#educational-value)
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
-**ECO-CLOUD JOB SCHEDULER** is a terminal-based application that manages and schedules computational jobs in a cloud environment. It efficiently handles job prioritization, efficiency tracking, and intelligent job retrieval using state-of-the-art data structures.
+**ECO-CLOUD JOB SCHEDULER** is a terminal based simulation that manages and schedules computational jobs in a cloud environment. It efficiently handles job prioritization, efficiency tracking, and intelligent job retrieval using state-of-the-art data structures.
 
-The system is designed for a 2nd-year Advanced Data Structures course project, demonstrating practical implementation of:
+The system is designed for an Advanced Data Structures course project, demonstrating practical implementation of:
 - **Priority Queues** for job scheduling
 - **MinMax Heaps** for dual optimization
 - **Tries** for fast job lookups
-- **Edit Distance** for spell correction
+- **Levenshtein Distance Algorithm** for spell correction
+- **AVL Trees** for execution time-based sorting and range queries
+- **Skip Lists** for efficient scheduled job history tracking
 
 ---
 
-## ✨ Features
+## Features
 
-### 1. ➕ **Add New Job**
+### 1. Add New Job
 - Create and store new cloud jobs
 - Define job properties: name, priority, efficiency, memory requirements
 - Automatic case-insensitive name handling
@@ -44,92 +47,75 @@ The system is designed for a 2nd-year Advanced Data Structures course project, d
 - **Efficiency Score**: 1-100 (1 = most efficient, 100 = least efficient)
 - **Memory Required**: 1-10,000 MB
 
-### 2. 🔍 **Search for Job by Name**
-- Fast O(log n) search using Trie data structure
+### 2. Search for Job by Name
+- Fast O(m) search using Trie data structure
 - Case-insensitive search
 - Returns full job details if found
-- Instant feedback with not-found alerts
+- Spellchecker uses Levenshtein Distance for correction suggestions if job name isn't found
 
-### 3. ⏱️ **Schedule Next Job**
+### 3. Schedule Next Job
 - Extract the highest priority job from the queue
-- Removes job from all data structures simultaneously
-- Maintains data structure synchronization
+- Removes job from all active data structures simultaneously
+- Records the scheduled job in history
 - Shows scheduled job details
-- Tracks remaining jobs
 
-### 4. 📊 **Show Most/Least Efficient Jobs**
+### 4. Show Most/Least Efficient Jobs
 - Identifies most efficient job (lowest score) in O(1) time
 - Identifies least efficient job (highest score) in O(1) time
 - Uses MinMax Heap for dual optimization
-- Useful for performance analysis and bottleneck identification
 
-### 5. ✏️ **Job Name Spell Checker**
-- Validates exact job name matches
-- Uses Levenshtein (Edit) Distance algorithm
-- Provides correction suggestions (expandable feature)
-- Case-insensitive validation
-
-### 6. 📋 **List All Jobs**
+### 5. List All Jobs
 - Display all active (unscheduled) jobs
 - Shows total job count
 - Traverses Trie structure alphabetically
-- Only displays jobs with `is_active = 1` flag
-- Formatted output with job details
+
+### 6. Show Jobs by Execution Time
+- Lists all active jobs sorted by their estimated block execution time
+- Maintained using an AVL Tree
+
+### 7. Find Jobs in Time Range
+- Perform range queries using the AVL tree to find jobs that require execution times between a specified minimum and maximum threshold
+
+### 8. View Scheduled Jobs History
+- Prints a fast-traversal history of all successfully scheduled jobs
+- Powered by a scalable Skip List structure
+
+### 9. View Scheduler Statistics
+- Shows cumulative statistics, counts, and insights from the scheduled jobs history
 
 ---
 
-## 💻 System Requirements
 
-### Minimum Requirements
-- **OS**: Windows / Linux / macOS
-- **Compiler**: GCC 6.3.0 or higher
-- **RAM**: 10 MB minimum
-- **Storage**: 200 KB for executable
-
-### Recommended Setup
-- GCC 9.0+
-- 100 MB available RAM
-- Windows 10+ / Ubuntu 18.04+ / macOS 10.14+
-
----
-
-## 📂 Project Structure
+## Project Structure
 
 ```
 ads-cp/
 ├── README.md                 # This file
 ├── main.c                    # Main application logic & UI
-├── PCB.c / PCB.h            # Process Control Block (Job representation)
-├── PriorityQueue.c / .h     # Priority Queue (min-heap based)
-├── MinMaxHeap.c / .h        # MinMax Heap (dual extrema tracking)
-├── JobTrie.c / JobTrie.h    # Trie (job name storage & search)
-├── JobCorrector.c / .h      # Edit Distance (spell checking)
-├── scheduler.exe            # Compiled executable
-└── Makefile                 # Build configuration (optional)
+├── PCB.c / PCB.h             # Process Control Block (Job representation)
+├── PriorityQueue.c / .h      # Priority Queue (min-heap based)
+├── MinMaxHeap.c / .h         # MinMax Heap (dual extrema tracking)
+├── JobTrie.c / JobTrie.h     # Trie (job name storage & search)
+├── JobCorrector.c /      # Edit Distance (spell checking)
+├── AVLTree.c / AVLTree.h     # AVL Tree (execution time tracking)
+├── SkipList.c / SkipList.h   # Skip List (scheduling history)
+└── scheduler.exe             # Compiled executable
 ```
 
 ---
 
-## 🏗️ Data Structures Used
+## Data Structures Used
 
-### 1. **Priority Queue (Min-Heap)**
+### 1. Priority Queue (Min-Heap)
 - **File**: `PriorityQueue.c / .h`
 - **Purpose**: Schedule jobs by priority
 - **Implementation**: Binary heap with min-property
-- **Operations**: 
+- **Operations**:
   - Insert: O(log n)
   - Extract min: O(log n)
   - Peek min: O(1)
 
-**Example:**
-```
-Jobs ordered by priority (lower = higher):
-[Priority=1, Priority=3, Priority=5, Priority=7]
-         ↓
-    Scheduled first
-```
-
-### 2. **MinMax Heap**
+### 2. MinMax Heap
 - **File**: `minMax.c / MinMaxHeap.h`
 - **Purpose**: Track most and least efficient jobs simultaneously
 - **Implementation**: Dual-level binary heap (min at even levels, max at odd levels)
@@ -137,20 +123,11 @@ Jobs ordered by priority (lower = higher):
   - Insert: O(log n)
   - Extract min: O(log n)
   - Extract max: O(log n)
-  - Peek min: O(1) ✨
-  - Peek max: O(1) ✨
-  - Delete by PCB: O(n) → O(log n) after deletion
+  - Peek min: O(1)
+  - Peek max: O(1)
+  - Delete by PCB: O(n) search -> O(log n) after deletion
 
-**Structure:**
-```
-                    Min (Index 0)
-                   /            \
-            Max (1)              Max (2)
-            /    \               /    \
-         Min(3) Min(4)       Min(5)  Min(6)
-```
-
-### 3. **Trie (Prefix Tree)**
+### 3. Trie (Prefix Tree)
 - **File**: `JobTrie.c / JobTrie.h`
 - **Purpose**: Store job names and enable fast retrieval
 - **Implementation**: 26-character alphabet tree
@@ -159,305 +136,186 @@ Jobs ordered by priority (lower = higher):
   - Search: O(m)
   - Traverse (list all): O(n)
 
-**Example:**
-```
-Jobs: "dataprocessor", "imagerenderer", "videoencoder"
-
-                    root
-                   / | \
-                  d  i  v
-                  |  |  |
-                  a  m  i
-                  |  |  |
-              [dataprocessor] [imagerenderer] [videoencoder]
-```
-
-### 4. **Edit Distance (Levenshtein)**
-- **File**: `JobCorrector.c / JobCorrector.h`
+### 4. Edit Distance (Levenshtein)
+- **File**: `JobCorrector.c`
 - **Purpose**: Spell check and job name correction
 - **Implementation**: Dynamic Programming with 2D DP table
 - **Operations**:
-  - Edit distance: O(m*n) where m, n = string lengths
+  - Edit distance: O(m*l) where m, l = string lengths
   - Allowed operations: Insert, Delete, Replace
 
-**Example:**
-```
-edit_distance("imagerenderer", "imagrenderer") = 1
-              (one deletion needed)
-```
+### 5. AVL Tree
+- **File**: `AVLTree.c / AVLTree.h`
+- **Purpose**: Sort jobs by expected execution time and permit time-range queries
+- **Implementation**: Self-balancing binary search tree
+- **Operations**:
+  - Insert/Delete: O(log n)
+  - Search: O(log n)
+  - Range Query: O(log n + k)
+
+### 6. Skip List
+- **File**: `SkipList.c / SkipList.h`
+- **Purpose**: Maintain a history of completed/scheduled jobs for analysis
+- **Implementation**: Probabilistic multi-level linked list
+- **Operations**:
+  - Insert: Expected O(log n)
+  - Search: Expected O(log n)
 
 ---
 
-## 🔨 Compilation
+## Compilation
 
 ### Using GCC (Recommended)
 
-#### **Basic Compilation:**
+#### Basic Compilation:
 ```bash
-gcc -o scheduler main.c PCB.c PriorityQueue.c JobTrie.c minMax.c JobCorrector.c
-```
-
-#### **With Warnings:**
-```bash
-gcc -Wall -Wextra -o scheduler main.c PCB.c PriorityQueue.c JobTrie.c minMax.c JobCorrector.c
-```
-
-#### **Optimized Build:**
-```bash
-gcc -O2 -o scheduler main.c PCB.c PriorityQueue.c JobTrie.c minMax.c JobCorrector.c
-```
-
-#### **Debug Build:**
-```bash
-gcc -g -o scheduler main.c PCB.c PriorityQueue.c JobTrie.c minMax.c JobCorrector.c
-```
-
-### Expected Output
-```
-✅ Compilation successful!
+gcc -o scheduler main.c PCB.c PriorityQueue.c JobTrie.c minMax.c JobCorrector.c AVLTree.c SkipList.c
 ```
 
 ---
 
-## 🚀 How to Run
+## How to Run
 
-### Step 1: Navigate to Project Directory
-```bash
-cd "c:\Users\HP\Desktop\Workspace\VIT MODULE 4\ADS\cp\ads-cp"
-```
-
-### Step 2: Run the Executable
+### Step 1: Run the Executable
 ```bash
 ./scheduler
-```
-or
-```bash
+# or
 scheduler.exe
 ```
 
-### Step 3: See Welcome Screen
+### Step 2: See Welcome Screen
 ```
-🚀 Welcome to ECO-CLOUD JOB SCHEDULER!
-
-═══════════════════════════════════════════════════════════
-        ☁️  ECO-CLOUD JOB SCHEDULER ☁️
-═══════════════════════════════════════════════════════════
-  1. ➕ Add a new job
-  2. 🔍 Search for a job by name
-  3. ⏱️  Schedule next job (by priority)
-  4. 📊 Show most/least efficient job
-  5. ✏️  Suggest correct job name (spell check)
-  6. 📋 List all jobs
-  0. 🚪 Exit
-═══════════════════════════════════════════════════════════
+  ECO-CLOUD JOB SCHEDULER 
+  1. Add a new job
+  2. Search for a job by name
+  3. Schedule next job (by priority)
+  4. Show most/least efficient job
+  5. List all jobs
+  6. Show jobs by execution time
+  7. Find jobs in time range
+  8. View scheduled jobs history
+  9. View scheduler statistics
+  0. Exit
 ```
 
 ---
 
-## 📖 Usage Guide
+## Usage Guide
 
-### **Complete Workflow Example**
+### Complete Workflow Example
 
-#### **Step 1: Add Jobs (Option 1)**
+#### Step 1: Add Jobs (Option 1)
 ```
-➤ Enter your choice: 1
+Enter your choice: 1
 
 Adding new job...
-─────────────────────────────────
 Job name: DataProcessor
 Priority (1-10, lower = higher priority): 3
 Efficiency score (1-100, lower = more efficient): 25
 Memory required (MB, 1-10000): 512
-✅ Job 'dataprocessor' added successfully! (Total jobs: 1)
+Job 'dataprocessor' added successfully!
 ```
 
-#### **Step 2: Add More Jobs**
+#### Step 2: Show Efficiency (Option 4)
 ```
-➤ Enter your choice: 1
-Job name: ImageRenderer
-Priority (1-10, lower = higher priority): 1
-Efficiency score (1-100, lower = more efficient): 60
-Memory required (MB, 1-10000): 1024
-✅ Job 'imagerenderer' added successfully! (Total jobs: 2)
-
-➤ Enter your choice: 1
-Job name: VideoEncoder
-Priority (1-10, lower = higher priority): 2
-Efficiency score (1-100, lower = more efficient): 45
-Memory required (MB, 1-10000): 2048
-✅ Job 'videoencoder' added successfully! (Total jobs: 3)
-```
-
-#### **Step 3: Show Efficiency (Option 4)**
-```
-➤ Enter your choice: 4
+Enter your choice: 4
 
 Job Efficiency Analysis
-─────────────────────────────────
-⭐ Most efficient job:
-  ├─ Job ID: dataprocessor
-  ├─ Burst Time: 25 units
-  └─ Memory Required: 512 MB
-
-⚠️  Least efficient job:
-  ├─ Job ID: imagerenderer
-  ├─ Burst Time: 60 units
-  └─ Memory Required: 1024 MB
+Most efficient job:
+  - Job ID: dataprocessor
+  - Burst Time: 25 units
+  - Memory Required: 512 MB
 ```
 
-#### **Step 4: Search Job (Option 2)**
+#### Step 3: Search Job (Option 2)
 ```
-➤ Enter your choice: 2
+Enter your choice: 2
 
 Searching for job...
-─────────────────────────────────
-Enter job name: videoencoder
-✅ Job found:
-  ├─ Job ID: videoencoder
-  ├─ Burst Time: 45 units
-  └─ Memory Required: 2048 MB
+Enter job name: dataprocessor
+Job found:
+  - Job ID: dataprocessor
+  - Burst Time: 25 units
+  - Memory Required: 512 MB
 ```
 
-#### **Step 5: Schedule Next Job (Option 3)**
+#### Step 4: Schedule Next Job (Option 3)
 ```
-➤ Enter your choice: 3
+Enter your choice: 3
 
 Scheduling next job...
-─────────────────────────────────
-✅ Next scheduled job:
-  ├─ Job ID: imagerenderer
-  ├─ Burst Time: 60 units
-  └─ Memory Required: 1024 MB
-
-(Scheduled by highest priority = 1)
+Next scheduled job:
+  - Job ID: dataprocessor
+  - Burst Time: 25 units
+  - Memory Required: 512 MB
 ```
 
-#### **Step 6: List All Jobs (Option 6)**
+#### Step 5: Exit (Option 0)
 ```
-➤ Enter your choice: 6
-
-All Jobs in Database
-─────────────────────────────────
-Total jobs: 2
-
-  ├─ Job ID: dataprocessor
-  ├─ Burst Time: 25 units
-  └─ Memory Required: 512 MB
-
-  ├─ Job ID: videoencoder
-  ├─ Burst Time: 45 units
-  └─ Memory Required: 2048 MB
-
-(Note: imagerenderer is NOT listed - it was scheduled!)
-```
-
-#### **Step 7: Exit (Option 0)**
-```
-➤ Enter your choice: 0
+Enter your choice: 0
 
 Shutting down...
-📊 Cleanup Summary:
-  • Destroying Priority Queue...
-  • Destroying MinMax Heap...
-  • Destroying Job Database...
+Cleanup Summary:
+  - Destroying Priority Queue...
+  - Destroying MinMax Heap...
+  - Destroying Job Database...
+  - Destroying AVL Tree...
+  - Destroying Job History...
 
-✨ ECO-CLOUD JOB SCHEDULER closed successfully!
-Thank you for using our service! 👋
+ECO-CLOUD JOB SCHEDULER closed successfully!
 ```
 
 ---
 
-## 🔍 Implementation Details
-
-### Job Addition Flow
-```
-User Input (name, priority, efficiency, memory)
-         ↓
-Create PCB (Process Control Block)
-         ↓
-    ┌────┴────┬────────────┬──────────────┐
-    ↓         ↓            ↓              ↓
-Enqueue to  Insert into  Insert into   Insert into
-Priority    MinMaxHeap   Trie          Database
-Queue                    (with flag)
-    ↓         ↓            ↓              ↓
-    └────┬────┴────────────┴──────────────┘
-         ↓
-    Confirm & Display
-```
-
-### Job Scheduling Flow
-```
-User selects "Schedule" (Option 3)
-         ↓
-Dequeue from Priority Queue (highest priority)
-         ↓
-    ┌────┴────┬────────────┐
-    ↓         ↓            ↓
-Mark as    Delete from   Display
-Inactive   MinMaxHeap    Job Details
-in Trie                   
-    ↓         ↓            ↓
-    └────┬────┴────────────┘
-         ↓
-    Decrement job_count
-```
+## Implementation Details
 
 ### Data Structure Synchronization
 ```
-3 Independent Data Structures:
-1. Priority Queue   → Ordered by PRIORITY (1-10)
-2. MinMaxHeap      → Ordered by EFFICIENCY (1-100)
-3. Trie            → Ordered by JOB NAME (alphabetical)
+5 Independent Data Structures:
+1. Priority Queue   -> Ordered by PRIORITY (1-10)
+2. MinMaxHeap       -> Ordered by EFFICIENCY (1-100)
+3. Trie             -> Ordered by JOB NAME (alphabetical)
+4. AVL Tree         -> Ordered by EXECUTION TIME
+5. Skip List        -> Maintains History records indefinitely across loops
 
 When Adding Job:
-├─ Priority Queue receives (job, priority)
-├─ MinMaxHeap receives (job, efficiency)
-└─ Trie receives (jobname, job_pointer)
+- Priority Queue receives (job, priority)
+- MinMaxHeap receives (job, efficiency)
+- Trie receives (jobname, job_pointer)
+- AVL Tree receives (job, execution_time)
 
 When Scheduling Job:
-├─ Find job in Priority Queue → dequeue()
-├─ Find SAME job in MinMaxHeap → delete_by_pcb()
-├─ Find SAME job in Trie → mark_as_inactive()
-└─ All point to SAME PCB object (pointer-based)
-```
-
-### Memory Management
-```
-Total Active Jobs: ≤ 100 (MAX_QUEUE_SIZE)
-
-Memory per Job:
-- PCB struct: ~50 bytes
-- Queue node: ~12 bytes
-- Heap node: ~12 bytes
-- Trie nodes: ~104 bytes (26 pointers)
-
-Total: ~170 bytes per job minimum
-Max memory usage: ~17 KB (for 100 jobs)
+- Find job in Priority Queue -> dequeue()
+- Find SAME job in MinMaxHeap -> delete_by_pcb()
+- Find SAME job in Trie -> mark_as_inactive()
+- Move record to Skip List History
+- All point to SAME PCB object (pointer-based)
 ```
 
 ---
 
-## ⏱️ Time Complexity Analysis
+## Time Complexity Analysis
 
 | Operation | Data Structure | Time Complexity | Space |
 |-----------|----------------|-----------------|-------|
-| **Add Job** | All | O(log n) | O(1) |
-| **Search Job** | Trie | O(m) | O(1) |
-| **Schedule Job** | Priority Queue | O(log n) | O(1) |
-| **Get Most Efficient** | MinMaxHeap | O(1) ✨ | O(1) |
-| **Get Least Efficient** | MinMaxHeap | O(1) ✨ | O(1) |
-| **List All Jobs** | Trie | O(n + m) | O(n) |
-| **Delete by PCB** | MinMaxHeap | O(n) search + O(log n) delete | O(1) |
+| Add Job | All Active | O(log n) | O(1) |
+| Search Job | Trie | O(m) | O(1) |
+| Schedule Job | PQ + Skip List| O(log n) | O(1) |
+| Get Most Efficient | MinMaxHeap | O(1) | O(1) |
+| Get Least Efficient | MinMaxHeap | O(1) | O(1) |
+| List All Jobs | Trie | O(n + m) | O(n) |
+| Range Query (Time) | AVL Tree | O(log n + k) | O(1) |
+| Scheduled History | Skip List | O(n) print | O(n) |
+| Delete by PCB | MinMaxHeap | O(n) search + O(log n) delete | O(1) |
 
-**Legend:**
-- **n** = number of jobs
-- **m** = average job name length
-- ✨ = constant time (very fast!)
+Legend:
+- n = number of jobs
+- m = average job name length
+- k = number of jobs in range query
 
 ---
 
-## 🧪 Test Cases
+## Test Cases
 
 ### Test Case 1: Basic Operations
 ```
@@ -465,90 +323,38 @@ Max memory usage: ~17 KB (for 100 jobs)
 2. Schedule 2 jobs
 3. List remaining jobs (should show 2)
 4. Check efficiency (should be correct)
-Expected: ✅ All operations succeed
+Expected: All operations succeed
 ```
 
 ### Test Case 2: Data Structure Sync
 ```
 1. Add 3 jobs: A(p=1,e=20), B(p=3,e=50), C(p=2,e=80)
-2. Show efficiency: A is most efficient ✅
+2. Show efficiency: A is most efficient
 3. Schedule job (removes by priority)
-4. Show efficiency: Should NOT show scheduled job ✅
-Expected: ✅ Sync maintained
-```
-
-### Test Case 3: Edge Cases
-```
-1. Try to search non-existent job
-2. Try to schedule from empty queue
-3. Try invalid priority (11)
-4. Try empty job name
-Expected: ✅ Graceful error handling
-```
-
-### Test Case 4: Full Workflow
-```
-1. Add 5 jobs
-2. Schedule 3 jobs
-3. List all (should show 2)
-4. Search each remaining job
-5. Show efficiency correctly
-Expected: ✅ All features work together
+4. Show efficiency: Should NOT show scheduled job
+Expected: Sync maintained
 ```
 
 ---
 
-## 🐛 Known Limitations
+## Known Limitations
 
-1. **Fixed Size**: Maximum 100 jobs (configurable via `MAX_QUEUE_SIZE`)
-2. **Job Names**: Lowercase only (enforced for consistency)
-3. **Memory**: Single machine (no distributed scheduling)
-4. **Persistence**: No database - jobs lost after exit
-5. **Concurrency**: Single-threaded (no simultaneous operations)
-
----
-
-## 🚀 Future Enhancements
-
-1. **Dynamic Memory**: Replace fixed arrays with dynamic allocation
-2. **Persistence**: SQLite database integration
-3. **REST API**: Replace CLI with HTTP endpoints
-4. **Multi-threading**: Concurrent job execution
-5. **Web Dashboard**: Real-time monitoring UI
-6. **Job Retry Logic**: Automatic retry on failure
-7. **Resource Limits**: Enforce CPU and memory quotas
-8. **Job Dependencies**: Support job sequencing
+1. Fixed Size: Maximum 100 jobs (configurable via MAX_QUEUE_SIZE)
+2. Job Names: Lowercase only (enforced for consistency)
+3. Memory: Single machine (no distributed scheduling)
+4. Persistence: No database - jobs lost after exit
+5. Concurrency: Single-threaded (no simultaneous operations)
 
 ---
 
-## 📝 Code Quality
-
-### Best Practices Implemented
-- ✅ Input validation with helpful error messages
-- ✅ Memory safety (strncpy instead of strcpy)
-- ✅ Proper error handling
-- ✅ Modular code structure
-- ✅ Clear function documentation
-- ✅ Consistent naming conventions
-- ✅ Resource cleanup on exit
-
-### Compiler Warnings
-```
-GCC -Wall -Wextra: CLEAN ✅
-No warnings or errors
-```
-
----
-
-## 📚 Educational Value
+## Educational Value
 
 This project demonstrates:
-- **Priority Queue**: Job scheduling in operating systems
-- **MinMax Heap**: Dual optimization (finding min and max efficiently)
-- **Trie**: Fast string lookup (used in autocomplete, DNS)
-- **Edit Distance**: String similarity (spell checkers, DNA analysis)
-- **Data Structure Synchronization**: Multi-index data management
-- **Memory Management**: Pointer-based object sharing
-- **Error Handling**: Robust CLI application design
-
----
+- Priority Queue: Job scheduling in operating systems
+- MinMax Heap: Dual optimization (finding min and max efficiently)
+- Trie: Fast string lookup (used in autocomplete)
+- Edit Distance: String similarity (spell checkers)
+- AVL Tree: Self-optimizing balanced searches and ranges
+- Skip List: Performant probabilistic histories
+- Data Structure Synchronization: Multi-index data management
+- Object Sharing: Memory Management via reference counting and pointer-based structs
