@@ -43,9 +43,9 @@ int str_diff(char s1[50], char s2[50]) {
             if (s1[i - 1] == s2[j - 1]) {
                 dp[i][j] = dp[i - 1][j - 1];
             } else {
-                int del = str_diff_rec(i - 1, j,     s1, s2, dp);
-                int ins = str_diff_rec(i,     j - 1, s1, s2, dp);
-                int rep = str_diff_rec(i - 1, j - 1, s1, s2, dp);
+                int del = dp[i-1][j];
+                int ins = dp[i][j-1];
+                int rep = dp[i-1][j-1];
 
                 return dp[i][j] = 1 + min3(del, ins, rep);
             }
