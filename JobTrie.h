@@ -19,5 +19,5 @@ PCB* search_job(Trie* trie, const char* jobId);
 void list_all_jobs(TrieNode* node, char* prefix);
 void mark_job_scheduled(Trie* trie, const char* jobId);
 void destroy_trie(Trie* trie);
-
+int count_active_jobs(TrieNode* node);
 #endif
