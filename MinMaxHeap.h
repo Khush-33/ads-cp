@@ -5,29 +5,41 @@
 
 #define MAX_HEAP_SIZE 100
 
-// MinMax Heap Node: stores process and its efficiency score
+/* ---------- Structures ---------- */
+
+// Node storing process + efficiency score
 typedef struct {
     PCB* process;
-    int efficiency_score;  // Lower = more efficient
+    int efficiency_score;   // Lower value = higher efficiency
 } HeapNode;
 
+// Min-Max Heap structure
 typedef struct {
     HeapNode heap[MAX_HEAP_SIZE];
     int size;
 } MinMaxHeap;
 
-// Core Operations
-MinMaxHeap* create_minmax_heap();
-void minmax_insert(MinMaxHeap* mmh, PCB* p, int score);
-PCB* minmax_extract_min(MinMaxHeap* mmh);
-PCB* minmax_extract_max(MinMaxHeap* mmh);
-void minmax_delete_by_pcb(MinMaxHeap* mmh, PCB* p);
-PCB* minmax_peek_min(MinMaxHeap* mmh);
-PCB* minmax_peek_max(MinMaxHeap* mmh);
-int minmax_is_empty(MinMaxHeap* mmh);
-void minmax_destroy(MinMaxHeap* mmh);
+/* ---------- Core Operations ---------- */
 
-// Helper - Get level (0-indexed)
+MinMaxHeap* create_minmax_heap();
+
+void minmax_insert(MinMaxHeap* h, PCB* p, int score);
+
+PCB* minmax_extract_min(MinMaxHeap* h);
+PCB* minmax_extract_max(MinMaxHeap* h);
+
+PCB* minmax_peek_min(MinMaxHeap* h);
+PCB* minmax_peek_max(MinMaxHeap* h);
+
+void minmax_delete_by_pcb(MinMaxHeap* h, PCB* p);
+
+int minmax_is_empty(MinMaxHeap* h);
+
+void minmax_destroy(MinMaxHeap* h);
+
+/* ---------- Helper ---------- */
+
+// Returns level of node (0-based)
 int get_level(int index);
 
 #endif
