@@ -1,6 +1,8 @@
 #include "JobTrie.h"
 #include <stdlib.h>
 #include <string.h>
+// job trie implementation
+//job done 
 
 static TrieNode* create_node() {
     TrieNode* newNode = (TrieNode*)malloc(sizeof(TrieNode));
