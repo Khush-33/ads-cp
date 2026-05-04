@@ -25,15 +25,10 @@ MinMaxHeap* create_minmax_heap();
 
 void minmax_insert(MinMaxHeap* h, PCB* p, int score);
 
-PCB* minmax_extract_min(MinMaxHeap* h);
-PCB* minmax_extract_max(MinMaxHeap* h);
-
 PCB* minmax_peek_min(MinMaxHeap* h);
 PCB* minmax_peek_max(MinMaxHeap* h);
 
 void minmax_delete_by_pcb(MinMaxHeap* h, PCB* p);
-
-int minmax_is_empty(MinMaxHeap* h);
 
 void minmax_destroy(MinMaxHeap* h);
 

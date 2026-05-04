@@ -38,20 +38,12 @@ MinMaxHeap* create_minmax_heap() {
 
 /* ---------- Bubble Up ---------- */
 
-void bubble_up_min(MinMaxHeap* h, int i) {
+void bubble_up(MinMaxHeap* h, int i, int is_min) {
     while (i > 2) {
         int gp = get_parent(get_parent(i));
-        if (h->heap[i].efficiency_score < h->heap[gp].efficiency_score) {
-            swap(&h->heap[i], &h->heap[gp]);
-            i = gp;
-        } else break;
-    }
-}
-
-void bubble_up_max(MinMaxHeap* h, int i) {
-    while (i > 2) {
-        int gp = get_parent(get_parent(i));
-        if (h->heap[i].efficiency_score > h->heap[gp].efficiency_score) {
+        int comp = is_min ? (h->heap[i].efficiency_score < h->heap[gp].efficiency_score)
+                          : (h->heap[i].efficiency_score > h->heap[gp].efficiency_score);
+        if (comp) {
             swap(&h->heap[i], &h->heap[gp]);
             i = gp;
         } else break;
@@ -69,142 +61,50 @@ void minmax_insert(MinMaxHeap* h, PCB* p, int score) {
     if (i == 0) return;
 
     int parent = get_parent(i);
+    int is_min = is_min_level(i);
 
-    if (is_min_level(i)) {
-        if (h->heap[i].efficiency_score > h->heap[parent].efficiency_score) {
-            swap(&h->heap[i], &h->heap[parent]);
-            bubble_up_max(h, parent);
-        } else {
-            bubble_up_min(h, i);
-        }
+    int comp = is_min ? (h->heap[i].efficiency_score > h->heap[parent].efficiency_score)
+                      : (h->heap[i].efficiency_score < h->heap[parent].efficiency_score);
+
+    if (comp) {
+        swap(&h->heap[i], &h->heap[parent]);
+        bubble_up(h, parent, !is_min);
     } else {
-        if (h->heap[i].efficiency_score < h->heap[parent].efficiency_score) {
-            swap(&h->heap[i], &h->heap[parent]);
-            bubble_up_min(h, parent);
-        } else {
-            bubble_up_max(h, i);
-        }
+        bubble_up(h, i, is_min);
     }
 }
 
 /* ---------- Trickle Down ---------- */
 
-void trickle_down_min(MinMaxHeap* h, int i) {
+void trickle_down(MinMaxHeap* h, int i, int is_min) {
     int size = h->size;
 
     while (get_left(i) < size) {
-        int smallest = i;
+        int m = i;
 
-        // Check children + grandchildren
         for (int j = 1; j <= 6; j++) {
-            int idx;
+            int idx = (j <= 2) ? get_left(i) + (j - 1) : get_left(get_left(i)) + (j - 3);
 
-            if (j == 1) idx = get_left(i);
-            else if (j == 2) idx = get_right(i);
-            else idx = get_left(get_left(i)) + (j - 3);
-
-            if (idx < size &&
-                h->heap[idx].efficiency_score <
-                h->heap[smallest].efficiency_score) {
-                smallest = idx;
+            if (idx < size) {
+                int comp = is_min ? (h->heap[idx].efficiency_score < h->heap[m].efficiency_score)
+                                  : (h->heap[idx].efficiency_score > h->heap[m].efficiency_score);
+                if (comp) m = idx;
             }
         }
 
-        if (smallest == i) break;
+        if (m == i) break;
 
-        swap(&h->heap[i], &h->heap[smallest]);
+        swap(&h->heap[i], &h->heap[m]);
 
-        // If grandchild, fix parent relation
-        if (smallest >= get_left(get_left(i))) {
-            int parent = get_parent(smallest);
-            if (h->heap[smallest].efficiency_score >
-                h->heap[parent].efficiency_score) {
-                swap(&h->heap[smallest], &h->heap[parent]);
-            }
+        if (m >= get_left(get_left(i))) {
+            int parent = get_parent(m);
+            int comp = is_min ? (h->heap[m].efficiency_score > h->heap[parent].efficiency_score)
+                              : (h->heap[m].efficiency_score < h->heap[parent].efficiency_score);
+            if (comp) swap(&h->heap[m], &h->heap[parent]);
         }
 
-        i = smallest;
+        i = m;
     }
-}
-
-void trickle_down_max(MinMaxHeap* h, int i) {
-    int size = h->size;
-
-    while (get_left(i) < size) {
-        int largest = i;
-
-        // Check children + grandchildren
-        for (int j = 1; j <= 6; j++) {
-            int idx;
-
-            if (j == 1) idx = get_left(i);
-            else if (j == 2) idx = get_right(i);
-            else idx = get_left(get_left(i)) + (j - 3);
-
-            if (idx < size &&
-                h->heap[idx].efficiency_score >
-                h->heap[largest].efficiency_score) {
-                largest = idx;
-            }
-        }
-
-        if (largest == i) break;
-
-        swap(&h->heap[i], &h->heap[largest]);
-
-        // If grandchild, fix parent relation
-        if (largest >= get_left(get_left(i))) {
-            int parent = get_parent(largest);
-            if (h->heap[largest].efficiency_score <
-                h->heap[parent].efficiency_score) {
-                swap(&h->heap[largest], &h->heap[parent]);
-            }
-        }
-
-        i = largest;
-    }
-}
-
-/* ---------- Extract Min ---------- */
-
-PCB* minmax_extract_min(MinMaxHeap* h) {
-    if (!h || h->size == 0) return NULL;
-
-    PCB* min = h->heap[0].process;
-
-    h->heap[0] = h->heap[--h->size];
-
-    trickle_down_min(h, 0);
-
-    return min;
-}
-
-/* ---------- Extract Max ---------- */
-
-PCB* minmax_extract_max(MinMaxHeap* h) {
-    if (!h || h->size == 0) return NULL;
-
-    int max_idx;
-
-    if (h->size == 1) max_idx = 0;
-    else if (h->size == 2) max_idx = 1;
-    else {
-        max_idx = (h->heap[1].efficiency_score >
-                   h->heap[2].efficiency_score) ? 1 : 2;
-    }
-
-    PCB* max = h->heap[max_idx].process;
-
-    h->heap[max_idx] = h->heap[--h->size];
-
-    if (max_idx < h->size) {
-        if (is_min_level(max_idx))
-            trickle_down_min(h, max_idx);
-        else
-            trickle_down_max(h, max_idx);
-    }
-
-    return max;
 }
 
 /* ---------- Peek ---------- */
@@ -244,18 +144,11 @@ void minmax_delete_by_pcb(MinMaxHeap* h, PCB* p) {
     h->heap[idx] = h->heap[--h->size];
 
     if (idx < h->size) {
-        if (is_min_level(idx))
-            trickle_down_min(h, idx);
-        else
-            trickle_down_max(h, idx);
+        trickle_down(h, idx, is_min_level(idx));
     }
 }
 
 /* ---------- Utility ---------- */
-
-int minmax_is_empty(MinMaxHeap* h) {
-    return !h || h->size == 0;
-}
 
 void minmax_destroy(MinMaxHeap* h) {
     if (h) free(h);
