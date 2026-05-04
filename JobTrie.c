@@ -1,6 +1,8 @@
 #include "JobTrie.h"
 #include <stdlib.h>
 #include <string.h>
+// job trie implementation
+//job done 
 
 static TrieNode* create_node() {
     TrieNode* newNode = (TrieNode*)malloc(sizeof(TrieNode));
@@ -13,7 +15,6 @@ static TrieNode* create_node() {
     }
     return newNode;
 }
-
 static void destroy_node(TrieNode* node) {
     if (!node) return;
     
@@ -22,7 +23,6 @@ static void destroy_node(TrieNode* node) {
     }
     free(node);
 }
-
 Trie* create_trie() {
     Trie* trie = (Trie*)malloc(sizeof(Trie));
     if (trie) {
@@ -30,10 +30,8 @@ Trie* create_trie() {
     }
     return trie;
 }
-
 void insert_job(Trie* trie, const char* jobId, PCB* p) {
     if (!trie || !jobId || !p) return;
-    
     TrieNode* current = trie->root;
     
     for (int i = 0; jobId[i] != '\0'; i++) {
@@ -49,10 +47,8 @@ void insert_job(Trie* trie, const char* jobId, PCB* p) {
     current->isEndOfWord = 1;
     current->process = p;
 }
-
 PCB* search_job(Trie* trie, const char* jobId) {
     if (!trie || !jobId) return NULL;
-    
     TrieNode* current = trie->root;
     
     for (int i = 0; jobId[i] != '\0'; i++) {
@@ -67,10 +63,8 @@ PCB* search_job(Trie* trie, const char* jobId) {
     
     return (current && current->isEndOfWord) ? current->process : NULL;
 }
-
 void list_all_jobs(TrieNode* node, char* prefix) {
     if (!node) return;
-    
     if (node->isEndOfWord && node->process && node->process->is_active) {
         print_pcb_details(node->process);
     }
@@ -102,6 +96,14 @@ void mark_job_scheduled(Trie* trie, const char* jobId) {
     if (current && current->isEndOfWord && current->process) {
         current->process->is_active = 0;  // Mark as scheduled/inactive
     }
+}
+int count_active_jobs(TrieNode* node) {
+    if (!node) return 0;
+    int count = (node->isEndOfWord && node->process && node->process->is_active) ? 1 : 0;
+    for (int i = 0; i < 26; i++) {
+        if (node->children[i]) count += count_active_jobs(node->children[i]);
+    }
+    return count;
 }
 
 void destroy_trie(Trie* trie) {
